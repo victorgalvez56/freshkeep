@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { GlassView } from 'expo-glass-effect';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../hooks/useTheme';
 import { MealType } from '../types';
@@ -21,20 +22,9 @@ export function MealTypeFilter({ selected, onSelect }: Props) {
     >
       {MEAL_TYPES.map(type => {
         const isActive = selected === type.value;
-        return (
-          <TouchableOpacity
-            key={type.value}
-            style={[
-              styles.chip,
-              {
-                backgroundColor: isActive ? colors.primary : colors.card,
-                borderColor: isActive ? colors.primary : colors.border,
-              },
-              !isActive && colors.shadow,
-            ]}
-            onPress={() => onSelect(type.value)}
-            activeOpacity={0.7}
-          >
+
+        const content = (
+          <>
             <Ionicons
               name={type.icon as keyof typeof Ionicons.glyphMap}
               size={14}
@@ -48,6 +38,34 @@ export function MealTypeFilter({ selected, onSelect }: Props) {
             >
               {type.label}
             </Text>
+          </>
+        );
+
+        if (isActive) {
+          return (
+            <TouchableOpacity
+              key={type.value}
+              style={[
+                styles.chip,
+                { backgroundColor: colors.primary, borderColor: colors.primary },
+              ]}
+              onPress={() => onSelect(type.value)}
+              activeOpacity={0.7}
+            >
+              {content}
+            </TouchableOpacity>
+          );
+        }
+
+        return (
+          <TouchableOpacity
+            key={type.value}
+            onPress={() => onSelect(type.value)}
+            activeOpacity={0.7}
+          >
+            <GlassView style={styles.chip}>
+              {content}
+            </GlassView>
           </TouchableOpacity>
         );
       })}
@@ -68,7 +86,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 1,
   },
   label: {
     fontSize: 13,

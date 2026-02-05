@@ -97,7 +97,7 @@ export default function AddMealScreen() {
         </TouchableOpacity>
 
         {showEmojiPicker && (
-          <View style={[styles.emojiGrid, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.emojiGrid, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             {FOOD_EMOJIS.map(e => (
               <TouchableOpacity
                 key={e}

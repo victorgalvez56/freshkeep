@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,6 +20,7 @@ import { FoodItem, FoodCategory } from '../../src/types';
 import { FoodItemCard } from '../../src/components/FoodItemCard';
 import { EmptyState } from '../../src/components/EmptyState';
 import { CATEGORIES } from '../../src/constants/categories';
+import { Host, Picker } from '@expo/ui/swift-ui';
 
 type FilterStatus = 'all' | 'fresh' | 'expiring' | 'expired';
 
@@ -105,36 +107,51 @@ export default function InventoryScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.filtersContainer}>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={statusFilters}
-          keyExtractor={i => i.value}
-          contentContainerStyle={styles.filterList}
-          renderItem={({ item: f }) => (
-            <TouchableOpacity
-              style={[
-                styles.filterChip,
-                {
-                  backgroundColor: selectedStatus === f.value ? colors.primary : colors.surface,
-                  borderColor: selectedStatus === f.value ? colors.primary : colors.border,
-                },
-              ]}
-              onPress={() => setSelectedStatus(f.value)}
-            >
-              <Text
+      {Platform.OS === 'ios' ? (
+        <View style={styles.pickerContainer}>
+          <Host matchContents>
+            <Picker
+              options={statusFilters.map(f => f.label)}
+              selectedIndex={statusFilters.findIndex(f => f.value === selectedStatus)}
+              onOptionSelected={({ nativeEvent: { index } }) => {
+                setSelectedStatus(statusFilters[index].value);
+              }}
+              variant="segmented"
+            />
+          </Host>
+        </View>
+      ) : (
+        <View style={styles.filtersContainer}>
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={statusFilters}
+            keyExtractor={i => i.value}
+            contentContainerStyle={styles.filterList}
+            renderItem={({ item: f }) => (
+              <TouchableOpacity
                 style={[
-                  styles.filterText,
-                  { color: selectedStatus === f.value ? colors.primaryText : colors.text },
+                  styles.filterChip,
+                  {
+                    backgroundColor: selectedStatus === f.value ? colors.primary : colors.surface,
+                    borderColor: selectedStatus === f.value ? colors.primary : colors.border,
+                  },
                 ]}
+                onPress={() => setSelectedStatus(f.value)}
               >
-                {f.label}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
+                <Text
+                  style={[
+                    styles.filterText,
+                    { color: selectedStatus === f.value ? colors.primaryText : colors.text },
+                  ]}
+                >
+                  {f.label}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      )}
 
       <View style={styles.filtersContainer}>
         <FlatList
@@ -229,6 +246,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  pickerContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   filtersContainer: {
     paddingVertical: 4,

@@ -17,6 +17,7 @@ import { getFoodItems } from '../src/database/foodItems';
 import { generateRecipeSuggestions } from '../src/services/openai';
 import { RecipeSuggestion } from '../src/types';
 
+
 export default function AIRecipesScreen() {
   const db = useDatabase();
   const router = useRouter();

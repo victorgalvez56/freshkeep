@@ -183,13 +183,12 @@ export default function ShoppingScreen() {
       )}
 
       {checkedCount > 0 && (
-        <TouchableOpacity
-          style={[styles.clearRow, { backgroundColor: colors.surface }]}
-          onPress={handleClearChecked}
-        >
-          <Text style={[styles.clearText, { color: colors.danger }]}>
-            Limpiar {checkedCount} marcado{checkedCount !== 1 ? 's' : ''}
-          </Text>
+        <TouchableOpacity onPress={handleClearChecked}>
+          <View style={[styles.clearRow, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.clearText, { color: colors.danger }]}>
+              Limpiar {checkedCount} marcado{checkedCount !== 1 ? 's' : ''}
+            </Text>
+          </View>
         </TouchableOpacity>
       )}
 
@@ -199,7 +198,6 @@ export default function ShoppingScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={[styles.listItem, { backgroundColor: colors.card, borderColor: colors.border }]}
             onPress={() => handleToggle(item)}
             onLongPress={() => {
               Alert.alert('Eliminar producto', `Quitar "${item.name}" de la lista?`, [
@@ -207,35 +205,38 @@ export default function ShoppingScreen() {
                 { text: 'Eliminar', style: 'destructive', onPress: () => handleDelete(item) },
               ]);
             }}
+            style={{ marginHorizontal: 16, marginVertical: 3 }}
           >
-            <Ionicons
-              name={item.checked ? 'checkbox' : 'square-outline'}
-              size={22}
-              color={item.checked ? colors.primary : colors.textSecondary}
-            />
-            <View style={styles.listItemContent}>
-              <Text
-                style={[
-                  styles.listItemName,
-                  { color: item.checked ? colors.textSecondary : colors.text },
-                  item.checked && styles.strikethrough,
-                ]}
-                numberOfLines={1}
-              >
-                {item.name}
-              </Text>
-              <Text style={[styles.listItemDetail, { color: colors.textSecondary }]}>
-                {item.quantity} {item.unit} · {item.category}
-              </Text>
+            <View style={[styles.listItem, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 }]}>
+              <Ionicons
+                name={item.checked ? 'checkbox' : 'square-outline'}
+                size={22}
+                color={item.checked ? colors.primary : colors.textSecondary}
+              />
+              <View style={styles.listItemContent}>
+                <Text
+                  style={[
+                    styles.listItemName,
+                    { color: item.checked ? colors.textSecondary : colors.text },
+                    item.checked && styles.strikethrough,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {item.name}
+                </Text>
+                <Text style={[styles.listItemDetail, { color: colors.textSecondary }]}>
+                  {item.quantity} {item.unit} · {item.category}
+                </Text>
+              </View>
+              {item.checked && (
+                <TouchableOpacity
+                  onPress={() => handleMoveToInventory(item)}
+                  style={[styles.moveBtn, { backgroundColor: colors.primary + '20' }]}
+                >
+                  <Ionicons name="arrow-forward" size={14} color={colors.primary} />
+                </TouchableOpacity>
+              )}
             </View>
-            {item.checked && (
-              <TouchableOpacity
-                onPress={() => handleMoveToInventory(item)}
-                style={[styles.moveBtn, { backgroundColor: colors.primary + '20' }]}
-              >
-                <Ionicons name="arrow-forward" size={14} color={colors.primary} />
-              </TouchableOpacity>
-            )}
           </TouchableOpacity>
         )}
         ListEmptyComponent={
@@ -335,11 +336,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginHorizontal: 16,
-    marginVertical: 3,
     padding: 14,
     borderRadius: 16,
-    borderWidth: 1,
   },
   listItemContent: {
     flex: 1,

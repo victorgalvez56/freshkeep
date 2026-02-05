@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { GlassView, GlassContainer } from 'expo-glass-effect';
 import { useTheme } from '../hooks/useTheme';
 import { DailyNutrition } from '../types';
 
@@ -25,36 +26,33 @@ export function NutritionSummary({ nutrition }: Props) {
   ];
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.card }, colors.shadow]}>
-      <View style={styles.row}>
-        {stats.map(stat => (
-          <View key={stat.label} style={styles.statItem}>
-            <View style={[styles.statDot, { backgroundColor: stat.color }]} />
-            <Text style={[styles.statValue, { color: colors.text }]}>
-              {stat.value}
-              <Text style={[styles.statUnit, { color: colors.textSecondary }]}> {stat.unit}</Text>
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{stat.label}</Text>
-          </View>
-        ))}
-      </View>
-    </View>
+    <GlassContainer spacing={8} style={styles.container}>
+      {stats.map(stat => (
+        <GlassView key={stat.label} style={styles.statCard}>
+          <View style={[styles.statDot, { backgroundColor: stat.color }]} />
+          <Text style={[styles.statValue, { color: colors.text }]}>
+            {stat.value}
+            <Text style={[styles.statUnit, { color: colors.textSecondary }]}> {stat.unit}</Text>
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{stat.label}</Text>
+        </GlassView>
+      ))}
+    </GlassContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
+  container: {
     marginHorizontal: 16,
     marginVertical: 4,
-    padding: 16,
-    borderRadius: 16,
-  },
-  row: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  statItem: {
     alignItems: 'center',
+  },
+  statCard: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderRadius: 14,
     gap: 2,
   },
   statDot: {

@@ -39,6 +39,24 @@ export async function requestNotificationPermissions(): Promise<boolean> {
   return true;
 }
 
+export async function scheduleTestNotification(): Promise<boolean> {
+  const hasPermission = await requestNotificationPermissions();
+  if (!hasPermission) return false;
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: 'Producto por vencer',
+      body: 'Leche entera vence hoy! (notificacion de prueba)',
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 60,
+    },
+  });
+
+  return true;
+}
+
 export async function scheduleExpirationNotifications(db: SQLite.SQLiteDatabase): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
 

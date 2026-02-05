@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   Switch,
   TextInput,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useSettings } from '../../src/contexts/SettingsContext';
 import { AppSettings } from '../../src/types';
+import { scheduleTestNotification } from '../../src/utils/notifications';
 
 export default function SettingsScreen() {
   const { colors } = useTheme();
@@ -92,6 +94,21 @@ export default function SettingsScreen() {
           thumbColor="#FFFFFF"
         />
       </View>
+
+      <TouchableOpacity
+        style={[styles.card, styles.testBtn, { backgroundColor: colors.accent + '20', borderColor: colors.accent }]}
+        onPress={async () => {
+          const ok = await scheduleTestNotification();
+          if (ok) {
+            Alert.alert('Programada', 'Recibiras una notificacion de prueba en 1 minuto. Minimiza la app para verla.');
+          } else {
+            Alert.alert('Sin permisos', 'Habilita los permisos de notificaciones en la configuracion del dispositivo.');
+          }
+        }}
+      >
+        <Ionicons name="notifications-outline" size={18} color={colors.accent} />
+        <Text style={[styles.testBtnText, { color: colors.accent }]}>Probar notificacion (1 min)</Text>
+      </TouchableOpacity>
 
       <Text style={[styles.sectionTitle, { color: colors.text }]}>Apariencia</Text>
 
@@ -258,6 +275,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
+  },
+  testBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+  },
+  testBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   aiHeader: {
     flexDirection: 'row',

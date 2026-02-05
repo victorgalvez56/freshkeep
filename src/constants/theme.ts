@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    background: '#F8FEDA',
+    background: '#E2F2D8',
     surface: '#FFFFFF',
     text: '#333333',
     textSecondary: '#888888',
@@ -30,6 +30,23 @@ export const Colors = {
       },
       android: {
         elevation: 2,
+      },
+      default: {},
+    })!,
+    glass: {
+      card: 'rgba(255,255,255,0.72)',
+      surface: 'rgba(255,255,255,0.55)',
+      border: 'rgba(255,255,255,0.45)',
+    },
+    glassShadow: Platform.select({
+      ios: {
+        shadowColor: '#333333',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 16,
+      },
+      android: {
+        elevation: 3,
       },
       default: {},
     })!,
@@ -63,6 +80,23 @@ export const Colors = {
       },
       android: {
         elevation: 2,
+      },
+      default: {},
+    })!,
+    glass: {
+      card: 'rgba(42,42,42,0.72)',
+      surface: 'rgba(42,42,42,0.55)',
+      border: 'rgba(255,255,255,0.12)',
+    },
+    glassShadow: Platform.select({
+      ios: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.35,
+        shadowRadius: 16,
+      },
+      android: {
+        elevation: 3,
       },
       default: {},
     })!,

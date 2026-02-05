@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { GlassView } from 'expo-glass-effect';
 import { format, addDays, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useTheme } from '../hooks/useTheme';
@@ -45,20 +46,8 @@ export function DateSelector({ selectedDate, onDateChange }: Props) {
   const renderItem = ({ item }: { item: typeof dates[0] }) => {
     const isSelected = item.dateStr === selectedDate;
 
-    return (
-      <TouchableOpacity
-        style={[
-          styles.item,
-          {
-            backgroundColor: isSelected ? colors.primary : colors.card,
-            borderColor: item.isToday && !isSelected ? colors.primary : 'transparent',
-            borderWidth: item.isToday && !isSelected ? 1.5 : 0,
-          },
-          !isSelected && colors.shadow,
-        ]}
-        onPress={() => onDateChange(item.dateStr)}
-        activeOpacity={0.7}
-      >
+    const content = (
+      <>
         <Text
           style={[
             styles.dayName,
@@ -75,6 +64,34 @@ export function DateSelector({ selectedDate, onDateChange }: Props) {
         >
           {item.dayNumber}
         </Text>
+      </>
+    );
+
+    if (isSelected) {
+      return (
+        <TouchableOpacity
+          style={[styles.item, { backgroundColor: colors.primary }]}
+          onPress={() => onDateChange(item.dateStr)}
+          activeOpacity={0.7}
+        >
+          {content}
+        </TouchableOpacity>
+      );
+    }
+
+    return (
+      <TouchableOpacity
+        onPress={() => onDateChange(item.dateStr)}
+        activeOpacity={0.7}
+      >
+        <GlassView
+          style={[
+            styles.item,
+            item.isToday && { borderColor: colors.primary, borderWidth: 1.5 },
+          ]}
+        >
+          {content}
+        </GlassView>
       </TouchableOpacity>
     );
   };
