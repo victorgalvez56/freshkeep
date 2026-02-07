@@ -12,7 +12,7 @@ import {
 import { Text } from '../../src/components/StyledText';
 import { GlassView, GlassContainer } from 'expo-glass-effect';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useDatabase } from '../../src/hooks/useDatabase';
 import { useTheme } from '../../src/hooks/useTheme';
@@ -31,7 +31,6 @@ export default function HomeScreen() {
   const db = useDatabase();
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const insets = useSafeAreaInsets();
 
   const [selectedDate, setSelectedDate] = useState(getTodayString());
   const [mealFilter, setMealFilter] = useState<MealType | 'all'>('all');
@@ -216,7 +215,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {!isDark && (
         <Image
           style={styles.backgroundImage}
@@ -225,7 +224,7 @@ export default function HomeScreen() {
         />
       )}
       <ScrollView
-        style={[styles.container, { paddingTop: insets.top }]}
+        style={styles.container}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
         <View style={styles.header}>
@@ -288,7 +287,7 @@ export default function HomeScreen() {
 
         <View style={{ height: 32 }} />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

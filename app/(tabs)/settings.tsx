@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Text } from '../../src/components/StyledText';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useSettings } from '../../src/contexts/SettingsContext';
 import { AppSettings, AIProvider } from '../../src/types';
@@ -36,7 +36,6 @@ const CURRENCIES = [
 
 export default function SettingsScreen() {
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const { settings, updateSetting } = useSettings();
 
   const toggleNotifyDay = async (day: number) => {
@@ -68,7 +67,8 @@ export default function SettingsScreen() {
 
   return (
     <>
-      <ScrollView style={[styles.container, { backgroundColor: colors.background, paddingTop: Platform.OS === 'android' ? insets.top : 0 }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <ScrollView style={styles.container}>
         {/* Notificaciones */}
         <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 12 }]}>Notificaciones</Text>
 
@@ -236,6 +236,7 @@ export default function SettingsScreen() {
 
         <View style={{ height: Platform.select({ ios: 40, android: 190 }) }} />
       </ScrollView>
+      </SafeAreaView>
 
       {/* Currency picker modal */}
       <Modal visible={showCurrencyPicker} transparent animationType="fade">

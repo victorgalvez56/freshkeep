@@ -9,7 +9,7 @@ import {
 import { Text } from '../../src/components/StyledText';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDatabase } from '../../src/hooks/useDatabase';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useSettings } from '../../src/contexts/SettingsContext';
@@ -38,7 +38,6 @@ interface InvStats {
 export default function StatsScreen() {
   const db = useDatabase();
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const { settings } = useSettings();
 
   const [wasteStats, setWasteStats] = useState<WasteStats>({
@@ -83,8 +82,9 @@ export default function StatsScreen() {
   const consumedPercent = totalHandled > 0 ? Math.round((wasteStats.totalConsumed / totalHandled) * 100) : 0;
 
   return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background, paddingTop: Platform.OS === 'android' ? insets.top : 0 }]}
+      style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
     >
       <Text style={[styles.sectionTitle, { color: colors.text }]}>Resumen del Inventario</Text>
@@ -196,6 +196,7 @@ export default function StatsScreen() {
 
       <View style={{ height: 32 }} />
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

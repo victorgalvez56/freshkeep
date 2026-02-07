@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Text } from '../../src/components/StyledText';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useDatabase } from '../../src/hooks/useDatabase';
@@ -125,7 +125,7 @@ export default function InventoryScreen() {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.searchRow, { backgroundColor: colors.surface }]}>
         <View style={[styles.searchBar, { backgroundColor: colors.background, borderColor: colors.border }]}>
           <Ionicons name="search" size={18} color={colors.textSecondary} />
@@ -266,7 +266,7 @@ export default function InventoryScreen() {
           <Ionicons name="camera" size={26} color={colors.primaryText} />
         )}
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 

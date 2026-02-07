@@ -14,8 +14,9 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.freshkeep-shit.app",
+      "buildNumber": "2",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -26,7 +27,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.freshkeep_shit.app"
+      "package": "com.freshkeep_shit.app",
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png"
