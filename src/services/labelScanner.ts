@@ -1,7 +1,5 @@
 import { FoodCategory, StorageLocation } from '../types';
-
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-const MODEL = 'gpt-4o';
+import { AIConfig, chatCompletion } from '../constants/ai';
 
 export interface ScannedProductData {
   name?: string;
@@ -21,13 +19,9 @@ const VALID_CATEGORIES: FoodCategory[] = [
 const VALID_LOCATIONS: StorageLocation[] = ['fridge', 'freezer', 'pantry', 'counter'];
 
 export async function scanProductLabel(
-  apiKey: string,
+  config: AIConfig,
   imageBase64: string,
 ): Promise<ScannedProductData> {
-  if (!apiKey) {
-    throw new Error('No se ha configurado la API key de OpenAI. Ve a Ajustes para agregarla.');
-  }
-
   const systemPrompt = `Eres un asistente experto en identificar productos alimenticios a partir de fotos de etiquetas. Analiza la imagen y extrae la informacion que puedas identificar. Responde UNICAMENTE con un JSON valido, sin texto adicional, con los siguientes campos (todos opcionales, incluye solo los que puedas identificar):
 
 {
@@ -47,66 +41,30 @@ Notas:
 - Si no puedes identificar un campo con certeza, no lo incluyas
 - Para storageLocation, usa tu conocimiento sobre el producto para sugerir donde almacenarlo`;
 
-  let response: Response;
-  try {
-    response = await fetch(OPENAI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: 'system', content: systemPrompt },
+  const content = await chatCompletion(
+    config,
+    config.visionModel,
+    [
+      { role: 'system', content: systemPrompt },
+      {
+        role: 'user',
+        content: [
           {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: 'Analiza esta etiqueta de producto alimenticio y extrae los datos que puedas identificar.',
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: `data:image/jpeg;base64,${imageBase64}`,
-                  detail: 'high',
-                },
-              },
-            ],
+            type: 'text',
+            text: 'Analiza esta etiqueta de producto alimenticio y extrae los datos que puedas identificar.',
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:image/jpeg;base64,${imageBase64}`,
+              detail: 'high',
+            },
           },
         ],
-        temperature: 0.2,
-        max_tokens: 500,
-      }),
-    });
-  } catch {
-    throw new Error('Error de conexion. Verifica tu internet e intenta de nuevo.');
-  }
-
-  if (response.status === 401) {
-    throw new Error('API key invalida. Verifica tu clave en Ajustes.');
-  }
-
-  if (response.status === 429) {
-    throw new Error('Demasiadas solicitudes. Espera un momento e intenta de nuevo.');
-  }
-
-  if (!response.ok) {
-    throw new Error(`Error del servidor (${response.status}). Intenta de nuevo mas tarde.`);
-  }
-
-  let data: { choices?: { message?: { content?: string } }[] };
-  try {
-    data = await response.json();
-  } catch {
-    throw new Error('Error al procesar la respuesta del servidor.');
-  }
-
-  const content = data.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error('No se recibio respuesta del modelo.');
-  }
+      },
+    ],
+    { temperature: 0.2, maxTokens: 500 },
+  );
 
   let parsed: ScannedProductData;
   try {

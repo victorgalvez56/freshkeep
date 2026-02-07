@@ -19,12 +19,27 @@ import {
 } from '@expo-google-fonts/playpen-sans';
 import { useTheme } from '../src/hooks/useTheme';
 import { initDatabase } from '../src/database/schema';
-import { SettingsProvider } from '../src/contexts/SettingsContext';
+import { SettingsProvider, useSettings } from '../src/contexts/SettingsContext';
+import { Onboarding } from '../src/components/Onboarding';
 
 SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
   const { colors, isDark } = useTheme();
+  const { settings, updateSetting } = useSettings();
+
+  const handleOnboardingComplete = useCallback(async () => {
+    await updateSetting('hasSeenOnboarding', true);
+  }, [updateSetting]);
+
+  if (!settings.hasSeenOnboarding) {
+    return (
+      <>
+        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <Onboarding onComplete={handleOnboardingComplete} />
+      </>
+    );
+  }
 
   return (
     <>

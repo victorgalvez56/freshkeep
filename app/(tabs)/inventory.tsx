@@ -25,6 +25,7 @@ import { EmptyState } from '../../src/components/EmptyState';
 import { CATEGORIES } from '../../src/constants/categories';
 import { Host, Picker } from '@expo/ui/swift-ui';
 import { scanProductLabel } from '../../src/services/labelScanner';
+import { getAIConfig } from '../../src/constants/ai';
 
 type FilterStatus = 'all' | 'fresh' | 'expiring' | 'expired';
 
@@ -67,7 +68,7 @@ export default function InventoryScreen() {
     if (!settings.openaiApiKey) {
       Alert.alert(
         'API Key requerida',
-        'Para escanear etiquetas necesitas configurar tu API key de OpenAI. Ve a Ajustes para agregarla.',
+        'Para escanear etiquetas necesitas configurar tu API key. Ve a Ajustes para agregarla.',
       );
       return;
     }
@@ -87,7 +88,8 @@ export default function InventoryScreen() {
 
     setScanning(true);
     try {
-      const data = await scanProductLabel(settings.openaiApiKey, result.assets[0].base64);
+      const aiConfig = getAIConfig(settings.aiProvider, settings.openaiApiKey);
+      const data = await scanProductLabel(aiConfig, result.assets[0].base64);
       router.push({
         pathname: '/add-item',
         params: { scannedData: JSON.stringify(data) },

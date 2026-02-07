@@ -216,18 +216,24 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        style={styles.backgroundImage}
-        source={require('../../assets/background.png')}
-        resizeMode="cover"
-      />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {!isDark && (
+        <Image
+          style={styles.backgroundImage}
+          source={require('../../assets/background.png')}
+          resizeMode="cover"
+        />
+      )}
       <ScrollView
         style={[styles.container, { paddingTop: insets.top }]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>FreshKeep</Text>
+          <Image
+            source={isDark ? require('../../assets/images/title-logo-dark.png') : require('../../assets/images/title-logo.png')}
+            style={styles.titleLogo}
+            resizeMode="contain"
+          />
           <View style={styles.headerActions}>
             <TouchableOpacity
               onPress={() => router.push('/ai-recipes')}
@@ -307,6 +313,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '800',
+  },
+  titleLogo: {
+    height: 100,
+    width: 200,
   },
   headerActions: {
     flexDirection: 'row',

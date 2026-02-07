@@ -1,18 +1,12 @@
 import { FoodItem, RecipeSuggestion } from '../types';
 import { daysUntilExpiration } from '../utils/dates';
-
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-const MODEL = 'gpt-4o-mini';
+import { AIConfig, chatCompletion } from '../constants/ai';
 
 export async function generateRecipeSuggestions(
-  apiKey: string,
+  config: AIConfig,
   inventoryItems: FoodItem[],
   count: number = 3
 ): Promise<RecipeSuggestion[]> {
-  if (!apiKey) {
-    throw new Error('No se ha configurado la API key de OpenAI. Ve a Ajustes para agregarla.');
-  }
-
   const inventoryList = inventoryItems
     .map(item => {
       const days = daysUntilExpiration(item.expirationDate);
@@ -41,51 +35,15 @@ export async function generateRecipeSuggestions(
 
   const userPrompt = `Tengo estos ingredientes en mi inventario:\n${inventoryList}\n\nSugiere ${count} recetas que pueda preparar con estos ingredientes. Prioriza usar los ingredientes que estan por vencer. Los valores nutricionales deben ser estimaciones razonables por porcion.`;
 
-  let response: Response;
-  try {
-    response = await fetch(OPENAI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,
-      }),
-    });
-  } catch {
-    throw new Error('Error de conexion. Verifica tu internet e intenta de nuevo.');
-  }
-
-  if (response.status === 401) {
-    throw new Error('API key invalida. Verifica tu clave en Ajustes.');
-  }
-
-  if (response.status === 429) {
-    throw new Error('Demasiadas solicitudes. Espera un momento e intenta de nuevo.');
-  }
-
-  if (!response.ok) {
-    throw new Error(`Error del servidor (${response.status}). Intenta de nuevo mas tarde.`);
-  }
-
-  let data: { choices?: { message?: { content?: string } }[] };
-  try {
-    data = await response.json();
-  } catch {
-    throw new Error('Error al procesar la respuesta del servidor.');
-  }
-
-  const content = data.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error('No se recibio respuesta del modelo.');
-  }
+  const content = await chatCompletion(
+    config,
+    config.model,
+    [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    { temperature: 0.7, maxTokens: 2000 },
+  );
 
   let parsed: { recipes: RecipeSuggestion[] };
   try {

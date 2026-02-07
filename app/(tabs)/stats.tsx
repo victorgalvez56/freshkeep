@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { Text } from '../../src/components/StyledText';
 import { useFocusEffect } from 'expo-router';
@@ -83,7 +84,7 @@ export default function StatsScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
+      style={[styles.container, { backgroundColor: colors.background, paddingTop: Platform.OS === 'android' ? insets.top : 0 }]}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
     >
       <Text style={[styles.sectionTitle, { color: colors.text }]}>Resumen del Inventario</Text>

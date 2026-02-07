@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { Text } from './StyledText';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../hooks/useTheme';
+import { GlassContainer, GlassView } from 'expo-glass-effect';
+import { GlassCard } from './GlassCard';
 
 interface Props {
   icon: keyof typeof Ionicons.glyphMap;
@@ -15,9 +17,15 @@ export function EmptyState({ icon, title, message }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.iconBg, { backgroundColor: colors.primary + '20' }]}>
-        <Ionicons name={icon} size={48} color={colors.primary} />
-      </View>
+      {Platform.OS === 'android' ? (
+        <GlassCard style={[styles.iconBg]}>
+          <Ionicons name={icon} size={48} color={colors.primary} />
+        </GlassCard>
+      ) : (
+        <GlassView style={[styles.iconBg, { backgroundColor: colors.primary + '20' }, colors.shadow]}>
+          <Ionicons name={icon} size={48} color={colors.primary} />
+        </GlassView>
+      )}
       <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       <Text style={[styles.message, { color: colors.textSecondary }]}>{message}</Text>
     </View>

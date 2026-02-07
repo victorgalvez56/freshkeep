@@ -14,7 +14,11 @@ export async function getSettings(db: SQLite.SQLiteDatabase): Promise<AppSetting
       : DEFAULT_SETTINGS.dailySummary,
     currency: map.get('currency') ?? DEFAULT_SETTINGS.currency,
     theme: (map.get('theme') as AppSettings['theme']) ?? DEFAULT_SETTINGS.theme,
+    aiProvider: (map.get('aiProvider') as AppSettings['aiProvider']) ?? DEFAULT_SETTINGS.aiProvider,
     openaiApiKey: map.get('openaiApiKey') ?? DEFAULT_SETTINGS.openaiApiKey,
+    hasSeenOnboarding: map.has('hasSeenOnboarding')
+      ? map.get('hasSeenOnboarding') === 'true'
+      : DEFAULT_SETTINGS.hasSeenOnboarding,
   };
 }
 

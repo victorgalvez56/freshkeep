@@ -16,6 +16,7 @@ import { useSettings } from '../src/contexts/SettingsContext';
 import { getFoodItems } from '../src/database/foodItems';
 import { generateRecipeSuggestions } from '../src/services/openai';
 import { RecipeSuggestion } from '../src/types';
+import { getAIConfig } from '../src/constants/ai';
 
 
 export default function AIRecipesScreen() {
@@ -60,7 +61,8 @@ export default function AIRecipesScreen() {
         return;
       }
 
-      const result = await generateRecipeSuggestions(settings.openaiApiKey, items, 3);
+      const aiConfig = getAIConfig(settings.aiProvider, settings.openaiApiKey);
+      const result = await generateRecipeSuggestions(aiConfig, items, 3);
       setRecipes(result);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Ocurrio un error inesperado.');
@@ -103,7 +105,7 @@ export default function AIRecipesScreen() {
         </View>
         <Text style={[styles.emptyTitle, { color: colors.text }]}>API Key requerida</Text>
         <Text style={[styles.emptyMessage, { color: colors.textSecondary }]}>
-          Para generar recetas con IA necesitas configurar tu API key de OpenAI en Ajustes.
+          Para generar recetas con IA necesitas configurar tu API key en Ajustes.
         </Text>
         <TouchableOpacity
           style={[styles.primaryBtn, { backgroundColor: colors.primary }]}

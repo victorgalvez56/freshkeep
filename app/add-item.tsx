@@ -23,6 +23,7 @@ import { CATEGORIES, STORAGE_LOCATIONS, UNITS } from '../src/constants/categorie
 import { getDefaultExpirationDate, getTodayString, dateToDateString } from '../src/utils/dates';
 import { getCurrencySymbol } from '../src/utils/currency';
 import { scanProductLabel, ScannedProductData } from '../src/services/labelScanner';
+import { getAIConfig } from '../src/constants/ai';
 
 export default function AddItemScreen() {
   const db = useDatabase();
@@ -77,7 +78,7 @@ export default function AddItemScreen() {
     if (!settings.openaiApiKey) {
       Alert.alert(
         'API Key requerida',
-        'Para escanear etiquetas necesitas configurar tu API key de OpenAI. Ve a Ajustes para agregarla.',
+        'Para escanear etiquetas necesitas configurar tu API key. Ve a Ajustes para agregarla.',
       );
       return;
     }
@@ -97,7 +98,8 @@ export default function AddItemScreen() {
 
     setScanning(true);
     try {
-      const data = await scanProductLabel(settings.openaiApiKey, result.assets[0].base64);
+      const aiConfig = getAIConfig(settings.aiProvider, settings.openaiApiKey);
+      const data = await scanProductLabel(aiConfig, result.assets[0].base64);
 
       if (data.name) setName(data.name);
       if (data.category) setCategory(data.category);
