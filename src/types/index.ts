@@ -102,15 +102,12 @@ export interface RecipeSuggestion {
   instructions: string[];
 }
 
-export type AIProvider = 'openai' | 'groq' | 'deepseek' | 'google' | 'anthropic';
-
 export interface AppSettings {
   notifyDaysBefore: number[];
   dailySummary: boolean;
   currency: string;
   theme: 'light' | 'dark' | 'system';
-  aiProvider: AIProvider;
-  openaiApiKey: string;
+  hasConsentedAI: boolean;
   hasSeenOnboarding: boolean;
 }
 
@@ -119,7 +116,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   dailySummary: true,
   currency: 'PEN',
   theme: 'system',
-  aiProvider: 'openai',
-  openaiApiKey: '',
+  hasConsentedAI: false,
   hasSeenOnboarding: false,
 };

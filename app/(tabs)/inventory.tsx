@@ -25,7 +25,8 @@ import { EmptyState } from '../../src/components/EmptyState';
 import { CATEGORIES } from '../../src/constants/categories';
 import { Host, Picker } from '@expo/ui/swift-ui';
 import { scanProductLabel } from '../../src/services/labelScanner';
-import { getAIConfig } from '../../src/constants/ai';
+import { useAIConsent } from '../../src/hooks/useAIConsent';
+import { AIConsentDialog } from '../../src/components/AIConsentDialog';
 
 type FilterStatus = 'all' | 'fresh' | 'expiring' | 'expired';
 
@@ -33,8 +34,9 @@ export default function InventoryScreen() {
   const db = useDatabase();
   const router = useRouter();
   const { colors } = useTheme();
-  const { settings, rescheduleNotifications } = useSettings();
+  const { rescheduleNotifications } = useSettings();
   const insets = useSafeAreaInsets();
+  const { requireConsent, showDialog, handleAccept, handleDecline } = useAIConsent();
 
   const [items, setItems] = useState<FoodItem[]>([]);
   const [search, setSearch] = useState('');
@@ -64,15 +66,7 @@ export default function InventoryScreen() {
     setRefreshing(false);
   };
 
-  const handleScanLabel = async () => {
-    if (!settings.openaiApiKey) {
-      Alert.alert(
-        'API Key requerida',
-        'Para escanear etiquetas necesitas configurar tu API key. Ve a Ajustes para agregarla.',
-      );
-      return;
-    }
-
+  const doScan = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permiso denegado', 'Se necesita acceso a la camara para escanear etiquetas.');
@@ -88,8 +82,7 @@ export default function InventoryScreen() {
 
     setScanning(true);
     try {
-      const aiConfig = getAIConfig(settings.aiProvider, settings.openaiApiKey);
-      const data = await scanProductLabel(aiConfig, result.assets[0].base64);
+      const data = await scanProductLabel(result.assets[0].base64);
       router.push({
         pathname: '/add-item',
         params: { scannedData: JSON.stringify(data) },
@@ -99,6 +92,10 @@ export default function InventoryScreen() {
     } finally {
       setScanning(false);
     }
+  };
+
+  const handleScanLabel = () => {
+    requireConsent(doScan);
   };
 
   const handleMarkConsumed = async (item: FoodItem) => {
@@ -266,6 +263,8 @@ export default function InventoryScreen() {
           <Ionicons name="camera" size={26} color={colors.primaryText} />
         )}
       </TouchableOpacity>
+
+      <AIConsentDialog visible={showDialog} onAccept={handleAccept} onDecline={handleDecline} />
     </SafeAreaView>
   );
 }

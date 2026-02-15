@@ -87,12 +87,48 @@ export default function PrivacyPolicy() {
               <h2 className="text-xl font-bold text-freshkeep-text mb-3">
                 3. Uso de inteligencia artificial
               </h2>
+              <p className="mb-3">
+                FreshKeep utiliza inteligencia artificial para dos funciones
+                principales: escaneo de etiquetas y generacion de recetas. Estos
+                datos se procesan a traves de nuestro servidor y se envian a
+                OpenAI para su analisis. A continuacion detallamos que datos se
+                envian en cada caso:
+              </p>
+              <ul className="list-disc pl-6 space-y-2 mb-3">
+                <li>
+                  <strong>Escaneo de etiquetas:</strong> cuando tomas una foto
+                  de un producto, la imagen se envia a nuestro servidor y luego
+                  a OpenAI (GPT-4o) para extraer nombre, fecha de vencimiento,
+                  categoria y otros datos del producto. La imagen no se almacena
+                  en nuestros servidores.
+                </li>
+                <li>
+                  <strong>Generacion de recetas:</strong> cuando solicitas
+                  recetas, se envia la lista de ingredientes de tu inventario
+                  (nombre, cantidad, unidad y estado de vencimiento) a nuestro
+                  servidor y luego a OpenAI (GPT-4o-mini) para generar
+                  sugerencias. No se envian datos personales identificables.
+                </li>
+              </ul>
+              <p className="mb-3">
+                <strong>Consentimiento:</strong> antes de usar cualquier funcion
+                de IA por primera vez, la app te mostrara un dialogo solicitando
+                tu consentimiento explicito. Puedes revocar este consentimiento
+                en cualquier momento desde los ajustes de la aplicacion.
+              </p>
               <p>
-                FreshKeep utiliza servicios de IA de terceros para generar
-                recetas. Al usar esta función, los ingredientes que registras
-                pueden ser enviados a proveedores de IA para procesar tu
-                solicitud. No se envía información personal identificable, solo
-                la lista de ingredientes necesaria para generar las recetas.
+                <strong>Proveedor de IA:</strong> actualmente utilizamos OpenAI
+                como proveedor. Puedes consultar su politica de privacidad en{" "}
+                <a
+                  href="https://openai.com/privacy"
+                  className="text-freshkeep-primary font-semibold hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  openai.com/privacy
+                </a>
+                . Los datos enviados a traves de la API no se utilizan para
+                entrenar sus modelos.
               </p>
             </section>
 

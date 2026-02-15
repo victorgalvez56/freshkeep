@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform, ScrollView, Dimensions } from 'react-native';
 import { Text } from './StyledText';
-import { GlassView, GlassContainer } from 'expo-glass-effect';
+import { GlassView } from 'expo-glass-effect';
+import { GlassCard } from './GlassCard';
 import { useTheme } from '../hooks/useTheme';
 import { DailyNutrition } from '../types';
 
@@ -26,13 +27,6 @@ export function NutritionSummary({ nutrition }: Props) {
     { label: 'Carbos', value: `${Math.round(nutrition.totalCarbs)}`, unit: 'g', color: STAT_COLORS.carbs },
   ];
 
-  const androidCardStyle = {
-    backgroundColor: isDark ? 'rgba(50, 50, 50, 0.92)' : 'rgba(255, 255, 255, 0.95)',
-    borderWidth: 1,
-    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
-    elevation: 3,
-  };
-
   const StatCard = ({ stat }: { stat: typeof stats[0] }) => (
     <>
       <View style={[styles.statDot, { backgroundColor: stat.color }]} />
@@ -48,22 +42,27 @@ export function NutritionSummary({ nutrition }: Props) {
     return (
       <View style={styles.container}>
         {stats.map(stat => (
-          <View key={stat.label} style={[styles.statCard, androidCardStyle]}>
+          <GlassCard key={stat.label} style={styles.statCard} borderRadius={14}>
             <StatCard stat={stat} />
-          </View>
+          </GlassCard>
         ))}
       </View>
     );
   }
 
   return (
-    <GlassContainer spacing={8} style={styles.container}>
+    <ScrollView
+      horizontal
+      scrollEnabled={false}
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.container}
+    >
       {stats.map(stat => (
-        <GlassView key={stat.label} style={styles.statCard}>
+        <GlassView key={stat.label} style={[styles.statCard, colors.shadow]}>
           <StatCard stat={stat} />
         </GlassView>
       ))}
-    </GlassContainer>
+    </ScrollView>
   );
 }
 
@@ -76,7 +75,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   statCard: {
-    flex: 1,
+    width: (Dimensions.get('window').width - 32 - 24) / 4,
     alignItems: 'center',
     paddingVertical: 14,
     borderRadius: 14,

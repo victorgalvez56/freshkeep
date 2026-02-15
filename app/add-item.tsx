@@ -23,7 +23,8 @@ import { CATEGORIES, STORAGE_LOCATIONS, UNITS } from '../src/constants/categorie
 import { getDefaultExpirationDate, getTodayString, dateToDateString } from '../src/utils/dates';
 import { getCurrencySymbol } from '../src/utils/currency';
 import { scanProductLabel, ScannedProductData } from '../src/services/labelScanner';
-import { getAIConfig } from '../src/constants/ai';
+import { useAIConsent } from '../src/hooks/useAIConsent';
+import { AIConsentDialog } from '../src/components/AIConsentDialog';
 
 export default function AddItemScreen() {
   const db = useDatabase();
@@ -74,15 +75,9 @@ export default function AddItemScreen() {
   const [showUnitPicker, setShowUnitPicker] = useState(false);
   const [scanning, setScanning] = useState(false);
 
-  const handleScanLabel = async () => {
-    if (!settings.openaiApiKey) {
-      Alert.alert(
-        'API Key requerida',
-        'Para escanear etiquetas necesitas configurar tu API key. Ve a Ajustes para agregarla.',
-      );
-      return;
-    }
+  const { requireConsent, showDialog, handleAccept, handleDecline } = useAIConsent();
 
+  const doScan = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permiso denegado', 'Se necesita acceso a la camara para escanear etiquetas.');
@@ -98,8 +93,7 @@ export default function AddItemScreen() {
 
     setScanning(true);
     try {
-      const aiConfig = getAIConfig(settings.aiProvider, settings.openaiApiKey);
-      const data = await scanProductLabel(aiConfig, result.assets[0].base64);
+      const data = await scanProductLabel(result.assets[0].base64);
 
       if (data.name) setName(data.name);
       if (data.category) setCategory(data.category);
@@ -113,6 +107,10 @@ export default function AddItemScreen() {
     } finally {
       setScanning(false);
     }
+  };
+
+  const handleScanLabel = () => {
+    requireConsent(doScan);
   };
 
   const handleSave = async () => {
@@ -331,6 +329,8 @@ export default function AddItemScreen() {
 
         <View style={{ height: 40 }} />
       </View>
+
+      <AIConsentDialog visible={showDialog} onAccept={handleAccept} onDecline={handleDecline} />
     </ScrollView>
   );
 }

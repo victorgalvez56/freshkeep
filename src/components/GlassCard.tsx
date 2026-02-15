@@ -22,8 +22,8 @@ export function GlassCard({
 }: Props) {
   const { colors, isDark } = useTheme();
 
+  // iOS: let GlassView handle the blur natively, only add border + shadow
   const glassStyle: ViewStyle = {
-    backgroundColor: intensity === 'standard' ? colors.glass.card : colors.glass.surface,
     borderWidth: 1,
     borderColor: colors.glass.border,
     borderRadius,
@@ -70,10 +70,7 @@ export function GlassCard({
         onPress={onPress}
         activeOpacity={activeOpacity}
       >
-        <GlassView
-          style={[glassStyle, { borderRadius }]}
-          tintColor={intensity === 'standard' ? colors.glass.card : colors.glass.surface}
-        >
+        <GlassView style={[glassStyle, { borderRadius }]}>
           {children}
         </GlassView>
       </TouchableOpacity>
@@ -81,10 +78,7 @@ export function GlassCard({
   }
 
   return (
-    <GlassView
-      style={[glassStyle, style, { borderRadius }]}
-      tintColor={intensity === 'standard' ? colors.glass.card : colors.glass.surface}
-    >
+    <GlassView style={[glassStyle, style, { borderRadius }]}>
       {children}
     </GlassView>
   );
