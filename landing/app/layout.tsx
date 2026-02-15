@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Playpen_Sans } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const playpen = Playpen_Sans({
@@ -38,6 +40,8 @@ export default function RootLayout({
     <html lang="es" className={playpen.variable}>
       <body className="font-playpen text-freshkeep-text antialiased">
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
