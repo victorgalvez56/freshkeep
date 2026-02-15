@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { v4 as uuidv4 } from 'uuid';
+import * as Crypto from 'expo-crypto';
 import { ScannedProductData } from './labelScanner';
 import { FoodItem, RecipeSuggestion } from '../types';
 
@@ -13,7 +13,7 @@ async function getDeviceId(): Promise<string> {
 
   let id = await AsyncStorage.getItem(DEVICE_ID_KEY);
   if (!id) {
-    id = uuidv4();
+    id = Crypto.randomUUID();
     await AsyncStorage.setItem(DEVICE_ID_KEY, id);
   }
 
