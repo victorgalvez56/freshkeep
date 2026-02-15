@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { rateLimit } from '../_lib/rateLimit';
+import { checkLimit } from '../_lib/rateLimit';
 
 interface ItemInput {
   name: string;
@@ -34,11 +34,15 @@ function daysUntil(dateStr: string): number {
 }
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  const { ok } = rateLimit(ip);
+  const deviceId = request.headers.get('x-device-id');
+  if (!deviceId) {
+    return NextResponse.json({ error: 'Se requiere identificador de dispositivo.' }, { status: 400 });
+  }
+
+  const { ok } = checkLimit(deviceId, 'recipes');
   if (!ok) {
     return NextResponse.json(
-      { error: 'Demasiadas solicitudes. Espera un momento e intenta de nuevo.' },
+      { error: 'Has alcanzado el limite diario de recetas (3/dia). Intenta manana.' },
       { status: 429 },
     );
   }

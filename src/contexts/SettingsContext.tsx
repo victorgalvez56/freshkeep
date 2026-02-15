@@ -6,12 +6,14 @@ import { scheduleExpirationNotifications } from '../utils/notifications';
 
 interface SettingsContextType {
   settings: AppSettings;
+  settingsLoaded: boolean;
   updateSetting: (key: keyof AppSettings, value: AppSettings[keyof AppSettings]) => Promise<void>;
   rescheduleNotifications: () => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextType>({
   settings: DEFAULT_SETTINGS,
+  settingsLoaded: false,
   updateSetting: async () => {},
   rescheduleNotifications: async () => {},
 });
@@ -19,6 +21,7 @@ const SettingsContext = createContext<SettingsContextType>({
 export function SettingsProvider({ children }: PropsWithChildren) {
   const db = useSQLiteContext();
   const [settings, setLocalSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   const rescheduleNotifications = useCallback(async () => {
     try {
@@ -32,6 +35,7 @@ export function SettingsProvider({ children }: PropsWithChildren) {
     (async () => {
       const s = await getSettings(db);
       setLocalSettings(s);
+      setSettingsLoaded(true);
       // Schedule notifications on app startup
       await rescheduleNotifications();
     })();
@@ -50,7 +54,7 @@ export function SettingsProvider({ children }: PropsWithChildren) {
   );
 
   return (
-    <SettingsContext.Provider value={{ settings, updateSetting, rescheduleNotifications }}>
+    <SettingsContext.Provider value={{ settings, settingsLoaded, updateSetting, rescheduleNotifications }}>
       {children}
     </SettingsContext.Provider>
   );

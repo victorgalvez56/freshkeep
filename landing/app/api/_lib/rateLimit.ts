@@ -1,22 +1,44 @@
-const rateMap = new Map<string, { count: number; resetAt: number }>();
+interface DailyUsage {
+  scans: number;
+  recipes: number;
+  date: string; // YYYY-MM-DD
+}
 
-const WINDOW_MS = 60_000; // 1 minute
-const MAX_REQUESTS = 10;
+const usageMap = new Map<string, DailyUsage>();
 
-export function rateLimit(ip: string): { ok: boolean; remaining: number } {
-  const now = Date.now();
-  const entry = rateMap.get(ip);
+const DAILY_LIMITS = {
+  scans: 5,
+  recipes: 3,
+};
 
-  if (!entry || now > entry.resetAt) {
-    rateMap.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return { ok: true, remaining: MAX_REQUESTS - 1 };
+function getTodayStr(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getUsage(deviceId: string): DailyUsage {
+  const today = getTodayStr();
+  const entry = usageMap.get(deviceId);
+
+  if (!entry || entry.date !== today) {
+    const fresh = { scans: 0, recipes: 0, date: today };
+    usageMap.set(deviceId, fresh);
+    return fresh;
   }
 
-  entry.count++;
+  return entry;
+}
 
-  if (entry.count > MAX_REQUESTS) {
+export function checkLimit(
+  deviceId: string,
+  type: 'scans' | 'recipes',
+): { ok: boolean; remaining: number } {
+  const usage = getUsage(deviceId);
+  const limit = DAILY_LIMITS[type];
+
+  if (usage[type] >= limit) {
     return { ok: false, remaining: 0 };
   }
 
-  return { ok: true, remaining: MAX_REQUESTS - entry.count };
+  usage[type]++;
+  return { ok: true, remaining: limit - usage[type] };
 }

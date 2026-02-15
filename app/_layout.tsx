@@ -26,11 +26,15 @@ SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
   const { colors, isDark } = useTheme();
-  const { settings, updateSetting } = useSettings();
+  const { settings, settingsLoaded, updateSetting } = useSettings();
 
   const handleOnboardingComplete = useCallback(async () => {
     await updateSetting('hasSeenOnboarding', true);
   }, [updateSetting]);
+
+  if (!settingsLoaded) {
+    return null;
+  }
 
   if (!settings.hasSeenOnboarding) {
     return (

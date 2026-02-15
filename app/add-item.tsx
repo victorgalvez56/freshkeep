@@ -12,7 +12,7 @@ import { Text } from '../src/components/StyledText';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { Host, DateTimePicker } from '@expo/ui/swift-ui';
+import { CrossPlatformDatePicker } from '../src/components/CrossPlatformDatePicker';
 import { useDatabase } from '../src/hooks/useDatabase';
 import { useTheme } from '../src/hooks/useTheme';
 import { useSettings } from '../src/contexts/SettingsContext';
@@ -20,7 +20,7 @@ import { addFoodItem } from '../src/database/foodItems';
 
 import { FoodCategory, StorageLocation } from '../src/types';
 import { CATEGORIES, STORAGE_LOCATIONS, UNITS } from '../src/constants/categories';
-import { getDefaultExpirationDate, getTodayString, dateToDateString } from '../src/utils/dates';
+import { getDefaultExpirationDate, getTodayString } from '../src/utils/dates';
 import { getCurrencySymbol } from '../src/utils/currency';
 import { scanProductLabel, ScannedProductData } from '../src/services/labelScanner';
 import { useAIConsent } from '../src/hooks/useAIConsent';
@@ -271,25 +271,11 @@ export default function AddItemScreen() {
         <View style={styles.row}>
           <View style={styles.halfField}>
             <Text style={[styles.label, { color: colors.text }]}>Fecha de compra</Text>
-            <Host matchContents>
-              <DateTimePicker
-                variant="compact"
-                displayedComponents="date"
-                initialDate={purchaseDate}
-                onDateSelected={(date) => setPurchaseDate(dateToDateString(date))}
-              />
-            </Host>
+            <CrossPlatformDatePicker value={purchaseDate} onChange={setPurchaseDate} />
           </View>
           <View style={styles.halfField}>
             <Text style={[styles.label, { color: colors.text }]}>Fecha de vencimiento *</Text>
-            <Host matchContents>
-              <DateTimePicker
-                variant="compact"
-                displayedComponents="date"
-                initialDate={expirationDate}
-                onDateSelected={(date) => setExpirationDate(dateToDateString(date))}
-              />
-            </Host>
+            <CrossPlatformDatePicker value={expirationDate} onChange={setExpirationDate} />
           </View>
         </View>
 

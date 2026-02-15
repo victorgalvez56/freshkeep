@@ -1,12 +1,35 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { v4 as uuidv4 } from 'uuid';
 import { ScannedProductData } from './labelScanner';
 import { FoodItem, RecipeSuggestion } from '../types';
 
 const API_BASE = 'https://v0-freshkeep.vercel.app/api';
+const DEVICE_ID_KEY = '@freshkeep_device_id';
+
+let cachedDeviceId: string | null = null;
+
+async function getDeviceId(): Promise<string> {
+  if (cachedDeviceId) return cachedDeviceId;
+
+  let id = await AsyncStorage.getItem(DEVICE_ID_KEY);
+  if (!id) {
+    id = uuidv4();
+    await AsyncStorage.setItem(DEVICE_ID_KEY, id);
+  }
+
+  cachedDeviceId = id;
+  return id;
+}
 
 export async function scanLabel(imageBase64: string): Promise<ScannedProductData> {
+  const deviceId = await getDeviceId();
+
   const response = await fetch(`${API_BASE}/scan-label`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Device-ID': deviceId,
+    },
     body: JSON.stringify({ imageBase64 }),
   });
 
@@ -22,6 +45,8 @@ export async function generateRecipes(
   items: FoodItem[],
   count: number = 3,
 ): Promise<RecipeSuggestion[]> {
+  const deviceId = await getDeviceId();
+
   const payload = items.map(item => ({
     name: item.name,
     quantity: item.quantity,
@@ -31,7 +56,10 @@ export async function generateRecipes(
 
   const response = await fetch(`${API_BASE}/generate-recipes`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Device-ID': deviceId,
+    },
     body: JSON.stringify({ items: payload, count }),
   });
 

@@ -10,7 +10,7 @@ import {
 import { Text } from '../src/components/StyledText';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Host, DateTimePicker } from '@expo/ui/swift-ui';
+import { CrossPlatformDatePicker } from '../src/components/CrossPlatformDatePicker';
 import { useDatabase } from '../src/hooks/useDatabase';
 import { useTheme } from '../src/hooks/useTheme';
 import { useSettings } from '../src/contexts/SettingsContext';
@@ -18,7 +18,6 @@ import { getFoodItemById, updateFoodItem, deleteFoodItem } from '../src/database
 import { FoodCategory, StorageLocation } from '../src/types';
 import { CATEGORIES, STORAGE_LOCATIONS, UNITS } from '../src/constants/categories';
 import { getCurrencySymbol } from '../src/utils/currency';
-import { dateToDateString } from '../src/utils/dates';
 
 export default function EditItemScreen() {
   const db = useDatabase();
@@ -221,25 +220,11 @@ export default function EditItemScreen() {
         <View style={styles.row}>
           <View style={styles.halfField}>
             <Text style={[styles.label, { color: colors.text }]}>Fecha de compra</Text>
-            <Host matchContents>
-              <DateTimePicker
-                variant="compact"
-                displayedComponents="date"
-                initialDate={purchaseDate}
-                onDateSelected={(date) => setPurchaseDate(dateToDateString(date))}
-              />
-            </Host>
+            <CrossPlatformDatePicker value={purchaseDate} onChange={setPurchaseDate} />
           </View>
           <View style={styles.halfField}>
             <Text style={[styles.label, { color: colors.text }]}>Fecha de vencimiento *</Text>
-            <Host matchContents>
-              <DateTimePicker
-                variant="compact"
-                displayedComponents="date"
-                initialDate={expirationDate}
-                onDateSelected={(date) => setExpirationDate(dateToDateString(date))}
-              />
-            </Host>
+            <CrossPlatformDatePicker value={expirationDate} onChange={setExpirationDate} />
           </View>
         </View>
 

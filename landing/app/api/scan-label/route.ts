@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { rateLimit } from '../_lib/rateLimit';
+import { checkLimit } from '../_lib/rateLimit';
 
 const VALID_CATEGORIES = [
   'fruits', 'vegetables', 'dairy', 'cereals', 'canned',
@@ -28,11 +28,15 @@ Notas:
 - Para storageLocation, usa tu conocimiento sobre el producto para sugerir donde almacenarlo`;
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  const { ok } = rateLimit(ip);
+  const deviceId = request.headers.get('x-device-id');
+  if (!deviceId) {
+    return NextResponse.json({ error: 'Se requiere identificador de dispositivo.' }, { status: 400 });
+  }
+
+  const { ok, remaining } = checkLimit(deviceId, 'scans');
   if (!ok) {
     return NextResponse.json(
-      { error: 'Demasiadas solicitudes. Espera un momento e intenta de nuevo.' },
+      { error: 'Has alcanzado el limite diario de escaneos (5/dia). Intenta manana.' },
       { status: 429 },
     );
   }
