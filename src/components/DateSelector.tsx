@@ -90,15 +90,14 @@ export function DateSelector({ selectedDate, onDateChange }: Props) {
     if (Platform.OS === 'android') {
       return (
         <TouchableOpacity
-          style={[
-            styles.item,
-            androidItemStyle,
-            item.isToday && { borderColor: colors.primary, borderWidth: 1.5 },
-          ]}
           onPress={() => onDateChange(item.dateStr)}
           activeOpacity={0.7}
         >
-          {content}
+          <View style={item.isToday ? [styles.todayBorder, { borderColor: colors.text }] : undefined}>
+            <View style={[styles.item, androidItemStyle]}>
+              {content}
+            </View>
+          </View>
         </TouchableOpacity>
       );
     }
@@ -108,14 +107,11 @@ export function DateSelector({ selectedDate, onDateChange }: Props) {
         onPress={() => onDateChange(item.dateStr)}
         activeOpacity={0.7}
       >
-        <GlassView
-          style={[
-            styles.item,
-            item.isToday && { borderColor: colors.primary, borderWidth: 1.5 },
-          ]}
-        >
-          {content}
-        </GlassView>
+        <View style={item.isToday ? [styles.todayBorder, { borderColor: colors.text }] : undefined}>
+          <GlassView style={styles.item}>
+            {content}
+          </GlassView>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -152,6 +148,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 4,
+  },
+  todayBorder: {
+    borderWidth: 2,
+    borderRadius: 18,
+    padding: 1,
   },
   dayName: {
     fontSize: 12,

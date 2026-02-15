@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
-  TextInput,
   Modal,
   Platform,
 } from 'react-native';
@@ -14,10 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useSettings } from '../../src/contexts/SettingsContext';
-import { AppSettings, AIProvider } from '../../src/types';
-import { AI_PROVIDERS } from '../../src/constants/ai';
-
-const PROVIDER_KEYS = Object.keys(AI_PROVIDERS) as AIProvider[];
+import { AppSettings } from '../../src/types';
 
 const CURRENCIES = [
   { code: 'PEN', label: 'PEN — Sol peruano' },
@@ -54,16 +50,7 @@ export default function SettingsScreen() {
     { value: 'dark', label: 'Oscuro', icon: 'moon-outline' },
   ];
 
-  const [apiKeyInput, setApiKeyInput] = useState(settings.openaiApiKey);
-  const [showApiKey, setShowApiKey] = useState(false);
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
-
-  const handleSaveApiKey = async (key: string) => {
-    setApiKeyInput(key);
-    await updateSetting('openaiApiKey', key);
-  };
-
-  const currentProvider = AI_PROVIDERS[settings.aiProvider];
 
   return (
     <>
@@ -160,68 +147,6 @@ export default function SettingsScreen() {
             >
               <Text style={[styles.currencyValue, { color: colors.text }]}>{settings.currency}</Text>
               <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* IA */}
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Integracion con IA</Text>
-
-        <View style={[styles.card, { backgroundColor: colors.card }, colors.shadow]}>
-          <Text style={[styles.cardLabel, { color: colors.text }]}>Proveedor</Text>
-          <View style={styles.chipGroup}>
-            {PROVIDER_KEYS.map(key => (
-              <TouchableOpacity
-                key={key}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: settings.aiProvider === key ? colors.primary : colors.surface,
-                    borderColor: settings.aiProvider === key ? colors.primary : colors.border,
-                  },
-                ]}
-                onPress={() => updateSetting('aiProvider', key)}
-              >
-                <Text
-                  style={{
-                    color: settings.aiProvider === key ? colors.primaryText : colors.text,
-                    fontSize: 13,
-                    fontWeight: '500',
-                  }}
-                >
-                  {AI_PROVIDERS[key].name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <View style={[styles.divider, { backgroundColor: colors.border + '30' }]} />
-
-          <View style={styles.aiHeader}>
-            <Text style={[styles.cardLabel, { color: colors.text }]}>API Key</Text>
-            {settings.openaiApiKey ? (
-              <View style={[styles.aiIndicator, { backgroundColor: '#4CAF5020' }]}>
-                <Ionicons name="checkmark-circle" size={14} color="#4CAF50" />
-                <Text style={{ color: '#4CAF50', fontSize: 12, fontWeight: '500' }}>OK</Text>
-              </View>
-            ) : null}
-          </View>
-          <View style={styles.apiKeyRow}>
-            <TextInput
-              style={[styles.apiKeyInput, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-              value={apiKeyInput}
-              onChangeText={handleSaveApiKey}
-              placeholder={currentProvider.placeholder}
-              placeholderTextColor={colors.textSecondary}
-              secureTextEntry={!showApiKey}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            <TouchableOpacity
-              style={[styles.apiKeyToggle, { backgroundColor: colors.surface, borderColor: colors.border }]}
-              onPress={() => setShowApiKey(!showApiKey)}
-            >
-              <Ionicons name={showApiKey ? 'eye-off' : 'eye'} size={18} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -335,39 +260,6 @@ const styles = StyleSheet.create({
   currencyValue: {
     fontSize: 14,
     fontWeight: '600',
-  },
-  aiHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  aiIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-    marginBottom: 8,
-  },
-  apiKeyRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  apiKeyInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderRadius: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-  },
-  apiKeyToggle: {
-    borderWidth: 1,
-    borderRadius: 14,
-    width: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   aboutRow: {
     flexDirection: 'row',

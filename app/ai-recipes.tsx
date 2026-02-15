@@ -5,33 +5,30 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { Text } from '../src/components/StyledText';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useDatabase } from '../src/hooks/useDatabase';
 import { useTheme } from '../src/hooks/useTheme';
-import { useSettings } from '../src/contexts/SettingsContext';
 import { getFoodItems } from '../src/database/foodItems';
 import { generateRecipeSuggestions } from '../src/services/openai';
 import { RecipeSuggestion } from '../src/types';
-import { getAIConfig } from '../src/constants/ai';
+import { useAIConsent } from '../src/hooks/useAIConsent';
+import { AIConsentDialog } from '../src/components/AIConsentDialog';
 
 
 export default function AIRecipesScreen() {
   const db = useDatabase();
   const router = useRouter();
   const { colors } = useTheme();
-  const { settings } = useSettings();
+  const { hasConsented, requireConsent, showDialog, handleAccept, handleDecline } = useAIConsent();
 
   const [recipes, setRecipes] = useState<RecipeSuggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedIngredients, setExpandedIngredients] = useState<Set<number>>(new Set());
   const [expandedInstructions, setExpandedInstructions] = useState<Set<number>>(new Set());
-
-  const hasApiKey = !!settings.openaiApiKey;
 
   const toggleIngredients = (index: number) => {
     setExpandedIngredients(prev => {
@@ -49,7 +46,7 @@ export default function AIRecipesScreen() {
     });
   };
 
-  const handleGenerate = async () => {
+  const doGenerate = async () => {
     setLoading(true);
     setError(null);
 
@@ -61,14 +58,17 @@ export default function AIRecipesScreen() {
         return;
       }
 
-      const aiConfig = getAIConfig(settings.aiProvider, settings.openaiApiKey);
-      const result = await generateRecipeSuggestions(aiConfig, items, 3);
+      const result = await generateRecipeSuggestions(items, 3);
       setRecipes(result);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Ocurrio un error inesperado.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGenerate = () => {
+    requireConsent(doGenerate);
   };
 
   const handleSaveRecipe = (recipe: RecipeSuggestion) => {
@@ -97,23 +97,24 @@ export default function AIRecipesScreen() {
     });
   };
 
-  if (!hasApiKey) {
+  if (!hasConsented) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.background }]}>
         <View style={[styles.emptyIconBg, { backgroundColor: colors.primary + '20' }]}>
-          <Ionicons name="key-outline" size={48} color={colors.primary} />
+          <Ionicons name="sparkles-outline" size={48} color={colors.primary} />
         </View>
-        <Text style={[styles.emptyTitle, { color: colors.text }]}>API Key requerida</Text>
+        <Text style={[styles.emptyTitle, { color: colors.text }]}>Recetas con IA</Text>
         <Text style={[styles.emptyMessage, { color: colors.textSecondary }]}>
-          Para generar recetas con IA necesitas configurar tu API key en Ajustes.
+          Genera recetas personalizadas basadas en tu inventario. Necesitas aceptar el uso de IA para continuar.
         </Text>
         <TouchableOpacity
           style={[styles.primaryBtn, { backgroundColor: colors.primary }]}
-          onPress={() => router.push('/(tabs)/settings')}
+          onPress={handleGenerate}
         >
-          <Ionicons name="settings-outline" size={18} color={colors.primaryText} />
-          <Text style={[styles.primaryBtnText, { color: colors.primaryText }]}>Ir a Ajustes</Text>
+          <Ionicons name="sparkles" size={18} color={colors.primaryText} />
+          <Text style={[styles.primaryBtnText, { color: colors.primaryText }]}>Comenzar</Text>
         </TouchableOpacity>
+        <AIConsentDialog visible={showDialog} onAccept={handleAccept} onDecline={handleDecline} />
       </View>
     );
   }
@@ -238,6 +239,8 @@ export default function AIRecipesScreen() {
       ))}
 
       <View style={{ height: 40 }} />
+
+      <AIConsentDialog visible={showDialog} onAccept={handleAccept} onDecline={handleDecline} />
     </ScrollView>
   );
 }

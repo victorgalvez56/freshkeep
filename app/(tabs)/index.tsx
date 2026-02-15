@@ -8,11 +8,13 @@ import {
   Alert,
   Image,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { Text } from '../../src/components/StyledText';
-import { GlassView, GlassContainer } from 'expo-glass-effect';
+import { GlassView } from 'expo-glass-effect';
+import { GlassCard } from '../../src/components/GlassCard';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useDatabase } from '../../src/hooks/useDatabase';
 import { useTheme } from '../../src/hooks/useTheme';
@@ -31,6 +33,7 @@ export default function HomeScreen() {
   const db = useDatabase();
   const router = useRouter();
   const { colors, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const [selectedDate, setSelectedDate] = useState(getTodayString());
   const [mealFilter, setMealFilter] = useState<MealType | 'all'>('all');
@@ -98,21 +101,6 @@ export default function HomeScreen() {
   const alertItems = [...expiringItems];
   const totalAlerts = expiredCount + expiringItems.length;
 
-  // Android glass fallback styles
-  const androidGlassCard = {
-    backgroundColor: isDark ? 'rgba(50, 50, 50, 0.92)' : 'rgba(255, 255, 255, 0.95)',
-    borderWidth: 1,
-    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
-    elevation: 3,
-  };
-
-  const androidGlassBtn = {
-    backgroundColor: isDark ? 'rgba(50, 50, 50, 0.92)' : 'rgba(255, 255, 255, 0.95)',
-    borderWidth: 1,
-    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
-    elevation: 2,
-  };
-
   const NutritionCards = () => {
     const cards = [
       { color: '#F47551', value: Math.round(nutrition.totalCalories), unit: 'kcal', label: 'Calorias' },
@@ -136,35 +124,40 @@ export default function HomeScreen() {
       return (
         <View style={styles.nutritionContainer}>
           {cards.map(card => (
-            <View key={card.label} style={[styles.nutritionCard, androidGlassCard]}>
+            <GlassCard key={card.label} style={styles.nutritionCard} borderRadius={14}>
               <CardContent card={card} />
-            </View>
+            </GlassCard>
           ))}
         </View>
       );
     }
 
     return (
-      <GlassContainer spacing={8} style={styles.nutritionContainer}>
+      <ScrollView
+        horizontal
+        scrollEnabled={false}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.nutritionContainer}
+      >
         {cards.map(card => (
-          <GlassView key={card.label} style={styles.nutritionCard}>
+          <GlassView key={card.label} style={[styles.nutritionCard, colors.shadow]}>
             <CardContent card={card} />
           </GlassView>
         ))}
-      </GlassContainer>
+      </ScrollView>
     );
   };
 
   const HeaderButton = () => {
     if (Platform.OS === 'android') {
       return (
-        <View style={[styles.headerBtn, androidGlassBtn]}>
+        <GlassCard style={styles.headerBtn} borderRadius={22} intensity="subtle">
           <Ionicons name="sparkles" size={20} color={colors.accent} />
-        </View>
+        </GlassCard>
       );
     }
     return (
-      <GlassView style={styles.headerBtn}>
+      <GlassView style={[styles.headerBtn, colors.shadow]}>
         <Ionicons name="sparkles" size={20} color={colors.accent} />
       </GlassView>
     );
@@ -188,9 +181,13 @@ export default function HomeScreen() {
     );
 
     if (Platform.OS === 'android') {
-      return <View style={[styles.alertBanner, androidGlassCard]}>{content}</View>;
+      return (
+        <GlassCard style={styles.alertBanner} borderRadius={14}>
+          {content}
+        </GlassCard>
+      );
     }
-    return <GlassView style={styles.alertBanner}>{content}</GlassView>;
+    return <GlassView style={[styles.alertBanner, colors.shadow]}>{content}</GlassView>;
   };
 
   const AlertItem = ({ item }: { item: FoodItem }) => {
@@ -209,9 +206,13 @@ export default function HomeScreen() {
     );
 
     if (Platform.OS === 'android') {
-      return <View style={[styles.alertItem, androidGlassCard]}>{content}</View>;
+      return (
+        <GlassCard style={styles.alertItem} borderRadius={12}>
+          {content}
+        </GlassCard>
+      );
     }
-    return <GlassView style={styles.alertItem}>{content}</GlassView>;
+    return <GlassView style={[styles.alertItem, colors.shadow]}>{content}</GlassView>;
   };
 
   return (
@@ -225,6 +226,7 @@ export default function HomeScreen() {
       )}
       <ScrollView
         style={styles.container}
+        contentContainerStyle={{ paddingBottom: Platform.OS === 'android' ? 120 + insets.bottom : 32 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
         <View style={styles.header}>
@@ -285,7 +287,6 @@ export default function HomeScreen() {
           </View>
         )}
 
-        <View style={{ height: 32 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -343,7 +344,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   nutritionCard: {
-    flex: 1,
+    width: (Dimensions.get('window').width - 32 - 24) / 4,
     alignItems: 'center',
     paddingVertical: 14,
     borderRadius: 14,
