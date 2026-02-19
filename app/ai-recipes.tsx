@@ -82,7 +82,7 @@ export default function AIRecipesScreen() {
       ...recipe.instructions.map((inst, i) => `${i + 1}. ${inst}`),
     ].join('\n');
 
-    router.push({
+    router.replace({
       pathname: '/add-meal',
       params: {
         recipeName: recipe.name,

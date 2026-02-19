@@ -16,9 +16,10 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.freshkeep-shit.app",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "FreshKeep usa la camara para tomar fotos de etiquetas de productos alimenticios. La foto se analiza para extraer automaticamente el nombre del producto, fecha de vencimiento, categoria y precio. Por ejemplo, al fotografiar una caja de leche, la app lee la fecha de vencimiento y registra el producto en tu inventario."
       }
     },
     "android": {
@@ -42,6 +43,13 @@
         {
           "icon": "./assets/icon.png",
           "color": "#4CAF50"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "FreshKeep usa la camara para tomar fotos de etiquetas de productos alimenticios. La foto se analiza para extraer automaticamente el nombre del producto, fecha de vencimiento, categoria y precio. Por ejemplo, al fotografiar una caja de leche, la app lee la fecha de vencimiento y registra el producto en tu inventario.",
+          "photosPermission": false
         }
       ],
       "@react-native-community/datetimepicker"

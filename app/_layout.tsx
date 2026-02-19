@@ -79,6 +79,13 @@ function AppContent() {
           }}
         />
         <Stack.Screen
+          name="edit-meal"
+          options={{
+            title: 'Editar Comida',
+            presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
           name="ai-recipes"
           options={{
             title: 'Recetas con IA',

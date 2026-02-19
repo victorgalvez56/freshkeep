@@ -132,6 +132,9 @@ export default function InventoryScreen() {
             placeholderTextColor={colors.textSecondary}
             value={search}
             onChangeText={setSearch}
+            returnKeyType="search"
+            autoCapitalize="none"
+            autoCorrect={false}
           />
           {search.length > 0 && (
             <TouchableOpacity onPress={() => setSearch('')}>

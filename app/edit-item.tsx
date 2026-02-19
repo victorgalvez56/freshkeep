@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   Alert,
+  InputAccessoryView,
+  Keyboard,
+  Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Text } from '../src/components/StyledText';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -37,6 +40,10 @@ export default function EditItemScreen() {
   const [notes, setNotes] = useState('');
   const [showUnitPicker, setShowUnitPicker] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const quantityRef = useRef<TextInput>(null);
+  const priceRef = useRef<TextInput>(null);
+  const notesRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -109,9 +116,12 @@ export default function EditItemScreen() {
   }
 
   return (
-    <ScrollView
+    <>
+    <KeyboardAwareScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       keyboardShouldPersistTaps="handled"
+      enableOnAndroid
+      extraScrollHeight={20}
     >
       <View key={loading ? 'loading' : id} style={styles.form}>
         <Text style={[styles.label, { color: colors.text }]}>Nombre *</Text>
@@ -121,6 +131,12 @@ export default function EditItemScreen() {
           onChangeText={setName}
           placeholder="Ej: Leche entera"
           placeholderTextColor={colors.textSecondary}
+          autoCapitalize="words"
+          autoCorrect={false}
+          maxLength={100}
+          returnKeyType="next"
+          blurOnSubmit={false}
+          onSubmitEditing={() => quantityRef.current?.focus()}
         />
 
         <Text style={[styles.label, { color: colors.text }]}>Categoria</Text>
@@ -153,10 +169,15 @@ export default function EditItemScreen() {
           <View style={styles.halfField}>
             <Text style={[styles.label, { color: colors.text }]}>Cantidad</Text>
             <TextInput
+              ref={quantityRef}
               style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
               value={quantity}
               onChangeText={setQuantity}
               keyboardType="decimal-pad"
+              maxLength={8}
+              returnKeyType="next"
+              blurOnSubmit={false}
+              onSubmitEditing={() => priceRef.current?.focus()}
             />
           </View>
           <View style={styles.halfField}>
@@ -234,17 +255,23 @@ export default function EditItemScreen() {
             {getCurrencySymbol(settings.currency)}
           </Text>
           <TextInput
+            ref={priceRef}
             style={[styles.input, styles.priceInput, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
             value={price}
             onChangeText={setPrice}
             keyboardType="decimal-pad"
             placeholder="0.00"
             placeholderTextColor={colors.textSecondary}
+            maxLength={10}
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => notesRef.current?.focus()}
           />
         </View>
 
         <Text style={[styles.label, { color: colors.text }]}>Notas</Text>
         <TextInput
+          ref={notesRef}
           style={[styles.input, styles.textArea, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
           value={notes}
           onChangeText={setNotes}
@@ -252,6 +279,9 @@ export default function EditItemScreen() {
           placeholderTextColor={colors.textSecondary}
           multiline
           numberOfLines={3}
+          autoCapitalize="sentences"
+          maxLength={500}
+          {...(Platform.OS === 'ios' && { inputAccessoryViewID: 'notesAccessory' })}
         />
 
         <TouchableOpacity
@@ -272,7 +302,21 @@ export default function EditItemScreen() {
 
         <View style={{ height: 40 }} />
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
+
+    {Platform.OS === 'ios' && (
+      <InputAccessoryView nativeID="notesAccessory">
+        <View style={[styles.accessoryBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+          <TouchableOpacity onPress={() => Keyboard.dismiss()}>
+            <Text style={[styles.accessoryBtn, { color: colors.textSecondary }]}>Listo</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleSave}>
+            <Text style={[styles.accessoryBtn, { color: colors.primary }]}>Guardar</Text>
+          </TouchableOpacity>
+        </View>
+      </InputAccessoryView>
+    )}
+    </>
   );
 }
 
@@ -363,6 +407,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   deleteBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  accessoryBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  accessoryBtn: {
     fontSize: 16,
     fontWeight: '600',
   },

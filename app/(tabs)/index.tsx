@@ -76,6 +76,10 @@ export default function HomeScreen() {
     setSelectedDate(date);
   };
 
+  const handleMealPress = (meal: Meal) => {
+    router.push({ pathname: '/edit-meal', params: { id: meal.id } });
+  };
+
   const handleDeleteMeal = async (meal: Meal) => {
     Alert.alert(
       'Eliminar comida',
@@ -267,6 +271,7 @@ export default function HomeScreen() {
             <MealCard
               key={meal.id}
               meal={meal}
+              onPress={handleMealPress}
               onDelete={handleDeleteMeal}
             />
           ))

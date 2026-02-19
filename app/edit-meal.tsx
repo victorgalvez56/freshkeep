@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -15,39 +15,29 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useDatabase } from '../src/hooks/useDatabase';
 import { useTheme } from '../src/hooks/useTheme';
-import { addMeal } from '../src/database/meals';
-import { MealType } from '../src/types';
+import { getMealById, updateMeal, deleteMeal } from '../src/database/meals';
+import { MealType, MealSource } from '../src/types';
 import { MEAL_TYPES, FOOD_EMOJIS } from '../src/constants/meals';
-import { getTodayString } from '../src/utils/dates';
 
-export default function AddMealScreen() {
+export default function EditMealScreen() {
   const db = useDatabase();
   const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
-  const params = useLocalSearchParams<{
-    date?: string;
-    recipeName?: string;
-    recipeEmoji?: string;
-    recipeMealType?: string;
-    recipeCalories?: string;
-    recipeProtein?: string;
-    recipeFats?: string;
-    recipeCarbs?: string;
-    recipeServingSize?: string;
-    recipeNotes?: string;
-  }>();
 
-  const [name, setName] = useState(params.recipeName ?? '');
-  const [emoji, setEmoji] = useState(params.recipeEmoji ?? '🍽️');
-  const [mealType, setMealType] = useState<MealType>((params.recipeMealType as MealType) ?? 'lunch');
-  const [date, setDate] = useState(params.date ?? getTodayString());
-  const [servingSize, setServingSize] = useState(params.recipeServingSize ?? '1 porcion');
-  const [calories, setCalories] = useState(params.recipeCalories ?? '');
-  const [protein, setProtein] = useState(params.recipeProtein ?? '');
-  const [fats, setFats] = useState(params.recipeFats ?? '');
-  const [carbs, setCarbs] = useState(params.recipeCarbs ?? '');
-  const [notes, setNotes] = useState(params.recipeNotes ?? '');
+  const [name, setName] = useState('');
+  const [emoji, setEmoji] = useState('🍽️');
+  const [mealType, setMealType] = useState<MealType>('lunch');
+  const [date, setDate] = useState('');
+  const [servingSize, setServingSize] = useState('');
+  const [calories, setCalories] = useState('');
+  const [protein, setProtein] = useState('');
+  const [fats, setFats] = useState('');
+  const [carbs, setCarbs] = useState('');
+  const [notes, setNotes] = useState('');
+  const [source, setSource] = useState<MealSource>('manual');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const servingSizeRef = useRef<TextInput>(null);
   const caloriesRef = useRef<TextInput>(null);
@@ -58,13 +48,38 @@ export default function AddMealScreen() {
 
   const mealTypeOptions = MEAL_TYPES.filter(m => m.value !== 'all');
 
+  useEffect(() => {
+    if (!id) return;
+    (async () => {
+      const meal = await getMealById(db, id);
+      if (!meal) {
+        Alert.alert('Error', 'Comida no encontrada.');
+        router.back();
+        return;
+      }
+      setName(meal.name);
+      setEmoji(meal.emoji);
+      setMealType(meal.mealType);
+      setDate(meal.date);
+      setServingSize(meal.servingSize);
+      setCalories(meal.calories ? String(meal.calories) : '');
+      setProtein(meal.protein ? String(meal.protein) : '');
+      setFats(meal.fats ? String(meal.fats) : '');
+      setCarbs(meal.carbs ? String(meal.carbs) : '');
+      setNotes(meal.notes);
+      setSource(meal.source);
+      setLoading(false);
+    })();
+  }, [id, db]);
+
   const handleSave = async () => {
     if (!name.trim()) {
       Alert.alert('Falta el nombre', 'Por favor ingresa un nombre para la comida.');
       return;
     }
+    if (!id) return;
 
-    await addMeal(db, {
+    await updateMeal(db, id, {
       name: name.trim(),
       mealType,
       date,
@@ -75,11 +90,35 @@ export default function AddMealScreen() {
       servingSize: servingSize.trim(),
       emoji,
       notes: notes.trim(),
-      source: params.recipeName ? 'ai' : 'manual',
+      source,
     });
 
     router.back();
   };
+
+  const handleDelete = () => {
+    Alert.alert('Eliminar comida', `Seguro que quieres eliminar "${name}"?`, [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Eliminar',
+        style: 'destructive',
+        onPress: async () => {
+          if (id) {
+            await deleteMeal(db, id);
+            router.back();
+          }
+        },
+      },
+    ]);
+  };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ color: colors.textSecondary }}>Cargando...</Text>
+      </View>
+    );
+  }
 
   return (
     <>
@@ -89,7 +128,7 @@ export default function AddMealScreen() {
       enableOnAndroid
       extraScrollHeight={20}
     >
-      <View style={styles.form}>
+      <View key={loading ? 'loading' : id} style={styles.form}>
         <Text style={[styles.label, { color: colors.text }]}>Nombre *</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
@@ -97,7 +136,6 @@ export default function AddMealScreen() {
           onChangeText={setName}
           placeholder="Ej: Ensalada cesar"
           placeholderTextColor={colors.textSecondary}
-          autoFocus={!params.recipeName}
           autoCapitalize="words"
           autoCorrect={false}
           maxLength={100}
@@ -261,7 +299,7 @@ export default function AddMealScreen() {
           numberOfLines={3}
           autoCapitalize="sentences"
           maxLength={500}
-          {...(Platform.OS === 'ios' && { inputAccessoryViewID: 'mealNotesAccessory' })}
+          {...(Platform.OS === 'ios' && { inputAccessoryViewID: 'editMealNotesAccessory' })}
         />
 
         <TouchableOpacity
@@ -269,7 +307,15 @@ export default function AddMealScreen() {
           onPress={handleSave}
         >
           <Ionicons name="checkmark" size={20} color={colors.primaryText} />
-          <Text style={[styles.saveBtnText, { color: colors.primaryText }]}>Guardar</Text>
+          <Text style={[styles.saveBtnText, { color: colors.primaryText }]}>Guardar Cambios</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.deleteBtn, { borderColor: colors.danger }]}
+          onPress={handleDelete}
+        >
+          <Ionicons name="trash-outline" size={20} color={colors.danger} />
+          <Text style={[styles.deleteBtnText, { color: colors.danger }]}>Eliminar Comida</Text>
         </TouchableOpacity>
 
         <View style={{ height: 40 }} />
@@ -277,7 +323,7 @@ export default function AddMealScreen() {
     </KeyboardAwareScrollView>
 
     {Platform.OS === 'ios' && (
-      <InputAccessoryView nativeID="mealNotesAccessory">
+      <InputAccessoryView nativeID="editMealNotesAccessory">
         <View style={[styles.accessoryBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
           <TouchableOpacity onPress={() => Keyboard.dismiss()}>
             <Text style={[styles.accessoryBtn, { color: colors.textSecondary }]}>Listo</Text>
@@ -390,6 +436,20 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   saveBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  deleteBtn: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 12,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  deleteBtnText: {
     fontSize: 16,
     fontWeight: '600',
   },
