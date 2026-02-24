@@ -7,6 +7,14 @@
 </p>
 
 <p align="center">
+  <a href="https://apps.apple.com/pe/app/fresh-keep/id6758866761?l=en-GB">
+    <img src="https://img.shields.io/badge/App_Store-Available-black?style=for-the-badge&logo=apple&logoColor=white" alt="Download on the App Store" />
+  </a>
+  &nbsp;
+  <img src="https://img.shields.io/badge/Google_Play-Coming_Soon-gray?style=for-the-badge&logo=googleplay&logoColor=white" alt="Coming soon on Google Play" />
+</p>
+
+<p align="center">
   <a href="https://v0-freshkeep.vercel.app">Landing</a> &middot;
   <a href="https://v0-freshkeep.vercel.app/privacy">Privacy</a> &middot;
   <a href="https://v0-freshkeep.vercel.app/terms">Terms</a> &middot;
@@ -15,7 +23,7 @@
 
 ---
 
-FreshKeep is an open-source app to track your food, get alerts before items expire, and generate AI-powered recipes using what you already have in your kitchen. Available for iOS and Android.
+FreshKeep is an open-source app to track your food, get alerts before items expire, and generate AI-powered recipes using what you already have in your kitchen. Now available on the [App Store](https://apps.apple.com/pe/app/fresh-keep/id6758866761?l=en-GB). Android version coming soon.
 
 <p align="center">
   <img src="assets/images/onboarding-1.png" alt="FreshKeep Preview" width="280" />

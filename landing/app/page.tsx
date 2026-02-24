@@ -5,7 +5,9 @@ function StoreButtons() {
   return (
     <div className="flex flex-col sm:flex-row gap-4">
       <a
-        href="#"
+        href="https://apps.apple.com/pe/app/fresh-keep/id6758866761?l=en-GB"
+        target="_blank"
+        rel="noopener noreferrer"
         className="inline-flex items-center gap-3 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors"
       >
         <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
@@ -16,20 +18,22 @@ function StoreButtons() {
           <div className="text-lg font-semibold leading-tight">App Store</div>
         </div>
       </a>
-      <a
-        href="#"
-        className="inline-flex items-center gap-3 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors"
+      <div
+        className="inline-flex items-center gap-3 bg-black/50 text-white/70 px-6 py-3 rounded-xl cursor-default relative"
       >
         <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
           <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 1.33a1 1 0 010 1.724l-2.302 1.33-2.535-2.535 2.535-2.849zM5.864 3.457L16.8 9.79l-2.302 2.302L5.864 3.457z" />
         </svg>
         <div className="text-left">
-          <div className="text-[10px] leading-none">Disponible en</div>
+          <div className="text-[10px] leading-none">Muy pronto en</div>
           <div className="text-lg font-semibold leading-tight">
             Google Play
           </div>
         </div>
-      </a>
+        <span className="absolute -top-2 -right-2 bg-freshkeep-primary text-freshkeep-text text-[10px] font-bold px-2 py-0.5 rounded-full">
+          Pronto
+        </span>
+      </div>
     </div>
   );
 }
@@ -145,8 +149,8 @@ export default function LandingPage() {
               Descarga FreshKeep gratis
             </h2>
             <p className="text-freshkeep-text/70 mb-8 max-w-md mx-auto">
-              Empieza a reducir el desperdicio alimentario hoy. Disponible para
-              iOS y Android.
+              Empieza a reducir el desperdicio alimentario hoy. Disponible en
+              iOS. Muy pronto en Android.
             </p>
             <div className="flex justify-center">
               <StoreButtons />
