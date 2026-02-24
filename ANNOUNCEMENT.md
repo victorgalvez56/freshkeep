@@ -1,30 +1,30 @@
-# Fresh Keep - LinkedIn Announcement Post
+# Fresh Keep - Post de LinkedIn
 
 ---
 
-**Fresh Keep is live on the App Store!**
+**Fresh Keep ya esta disponible en el App Store!**
 
-After weeks of building, testing, and iterating, I'm excited to share that Fresh Keep is officially available for download on iOS.
+Despues de semanas de desarrollo, pruebas e iteraciones, me emociona compartir que Fresh Keep ya esta oficialmente disponible para descargar en iOS.
 
-Fresh Keep helps you reduce food waste by tracking what you have at home, alerting you before items expire, and generating AI-powered recipes with the ingredients you already own.
+Fresh Keep te ayuda a reducir el desperdicio de alimentos trackeando lo que tienes en casa, alertandote antes de que venzan y generando recetas con IA usando los ingredientes que ya tienes.
 
-**Key features:**
-- Scan product labels with your camera to add items instantly
-- Get smart expiration alerts so nothing goes to waste
-- Generate personalized recipes with AI using what's in your kitchen
-- Track your meals and nutrition
-- Visualize your consumption vs. waste with detailed statistics
+**Funcionalidades principales:**
+- Escanea etiquetas de productos con tu camara para agregarlos al instante
+- Recibe alertas inteligentes de vencimiento para que nada se desperdicie
+- Genera recetas personalizadas con IA usando lo que tienes en tu cocina
+- Registra tus comidas y nutricion
+- Visualiza tu consumo vs. desperdicio con estadisticas detalladas
 
-Download it here: https://apps.apple.com/pe/app/fresh-keep/id6758866761?l=en-GB
-
----
-
-**Android users — I need your help!**
-
-I'm looking for **14 testers** to join the closed testing program so I can publish Fresh Keep on Google Play. If you have an Android device and want early access, send me a DM or drop a comment below.
-
-It only takes a minute to join and you'll be among the first to try it out.
+Descargala aqui: https://apps.apple.com/pe/app/fresh-keep/id6758866761?l=en-GB
 
 ---
 
-#FreshKeep #iOS #AppStore #FoodWaste #ReactNative #Expo #OpenSource #Android #Testers #MobileApp #AI #IndieHacker
+**Usuarios de Android — necesito su ayuda!**
+
+Estoy buscando **14 testers** para unirse al programa de pruebas cerradas y asi poder publicar Fresh Keep en Google Play. Si tienes un dispositivo Android y quieres acceso anticipado, enviame un DM o deja un comentario.
+
+Solo toma un minuto unirse y seras de los primeros en probarlo.
+
+---
+
+#FreshKeep #iOS #AppStore #DesperdicioAlimentario #ReactNative #Expo #OpenSource #Android #Testers #MobileApp #IA #IndieHacker
